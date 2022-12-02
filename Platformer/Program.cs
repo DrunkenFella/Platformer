@@ -27,7 +27,7 @@ Rectangle enemyRect1 = new Rectangle(0, 0, enemyImageLeft.width, enemyImageLeft.
 //props 
 Rectangle ammoboxRect = new Rectangle(0, 0, ammoboxImage.width, ammoboxImage.height);
 Rectangle doorRect = new Rectangle(0, 0, doorImage.width, doorImage.height);
-Rectangle oldManRect = new Rectangle(0, 0, oldMan.width, oldMan.height);
+Rectangle oldManRect = new Rectangle(600, 400, oldMan.width + 70, oldMan.height);
 Rectangle trapRect = new Rectangle(700, 500, 64, 64);
 Rectangle floorRect = new Rectangle(600, 500, 64, 32);
 Rectangle shootRect = new Rectangle(100, 200, nerfDart.width, nerfDart.height);
@@ -98,7 +98,7 @@ while (Raylib.WindowShouldClose() == false)
                 //remove duck 
             }
         }
-        
+
     }
     else if (currentScene == "start")
     {
@@ -129,7 +129,20 @@ while (Raylib.WindowShouldClose() == false)
           600,
           400,
           Color.WHITE);
-          
+        if (Raylib.CheckCollisionRecs(playerRect, oldManRect))
+        {
+            Raylib.DrawText("[Press P to speak]",
+            500,
+            300, 30,
+            Color.WHITE);
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_P))
+            {
+            Raylib.DrawText("Back Of you fucking peasent",
+            500,
+            300, 30,
+            Color.WHITE);
+            }
+        }
         Raylib.DrawText($"Health = {playerHealth}", 0, 0, 30, Color.WHITE);
     }
     else if (currentScene == "start")
@@ -147,7 +160,9 @@ while (Raylib.WindowShouldClose() == false)
         Raylib.DrawText("Press R to restart", 200, 200, 64, Color.BLUE);
         if (Raylib.IsKeyDown(KeyboardKey.KEY_R))
         {
-            currentScene = ("start");
+            currentScene = ("game");
+            playerRect.x = 20;
+            playerRect.y = 40;
         }
     }
 
