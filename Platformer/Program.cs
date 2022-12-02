@@ -1,26 +1,55 @@
 ﻿using Raylib_cs;
+Random generator = new Random();
 
-Raylib.InitWindow(800, 700, "Platform Ghost");
+Raylib.InitWindow(800, 600, "Platform Ghost");
 Raylib.SetTargetFPS(60);
-float speed = 5.5f;
 
-//Texture
-Texture2D avatarImage = Raylib.LoadTexture("images/PlayerGhost.png");
-Texture2D enemyImage = Raylib.LoadTexture("");
-Texture2D menu = Raylib.LoadTexture("images/Graveyard_menu.png");
-Texture2D ammoBox = Raylib.LoadTexture("images/AmmoBox.png");
+//background
+Texture2D menuImage = Raylib.LoadTexture("images/Graveyard_menu.png");
 
-//Hitboxes
-Rectangle playerRect = new Rectangle(0, 0, avatarImage.width, avatarImage.height);
+
+//Images
+Texture2D playerImage = Raylib.LoadTexture("images/PlayerGhost.png");
+Texture2D enemyImage = Raylib.LoadTexture("images/DuckWithGun.png");
+Texture2D enemyImageLeft = Raylib.LoadTexture("images/DuckWithGunLeft.png");
+Texture2D ammoboxImage = Raylib.LoadTexture("images/AmmoBox.png");
+Texture2D doorImage = Raylib.LoadTexture("images/door.png");
+Texture2D oldMan = Raylib.LoadTexture("images/oldMan.png");
+Texture2D nerfDart = Raylib.LoadTexture("images/Nerfdart.png");
+
+
+
+//Hitbox
+Rectangle playerRect = new Rectangle(600, 0, playerImage.width, playerImage.height);
+//Duck enemy right and left
+Rectangle enemyRect = new Rectangle(0, 0, enemyImage.width, enemyImage.height);
+Rectangle enemyRect1 = new Rectangle(0, 0, enemyImageLeft.width, enemyImageLeft.height);
+//props 
+Rectangle ammoboxRect = new Rectangle(0, 0, ammoboxImage.width, ammoboxImage.height);
+Rectangle doorRect = new Rectangle(0, 0, doorImage.width, doorImage.height);
+Rectangle oldManRect = new Rectangle(0, 0, oldMan.width, oldMan.height);
 Rectangle trapRect = new Rectangle(700, 500, 64, 64);
-Rectangle enemyRect = new Rectangle(70, 70, enemyImage.width, enemyImage.height);
+Rectangle floorRect = new Rectangle(600, 500, 64, 32);
+Rectangle shootRect = new Rectangle(100, 200, nerfDart.width, nerfDart.height);
+
+//Lägg till skot 
+//Rectangle ShootRect = new Rectangle(enemy.x , enemy.y, 4, 2);
+
+int playerHealth = 50;
+int duckHealth = 30;
+
+float shootSpeed = 7f;
+
+float speed = 5f;
 
 string currentScene = "start"; //Start, game, end
 
-//Game
 while (Raylib.WindowShouldClose() == false)
 {
-    if (currentScene == "Game")
+
+    // Logik
+
+    if (currentScene == "game")
     {
         if (Raylib.IsKeyDown(KeyboardKey.KEY_D))
         {
@@ -38,6 +67,38 @@ while (Raylib.WindowShouldClose() == false)
         {
             playerRect.y += speed;
         }
+        else if (Raylib.IsKeyDown(KeyboardKey.KEY_R))
+        {
+            currentScene = ("start");
+        }
+        else if (Raylib.IsKeyDown(KeyboardKey.KEY_F))
+        {
+            //skott åt hållet man tittar åt
+        }
+
+        if (Raylib.CheckCollisionRecs(playerRect, trapRect))
+        {
+            currentScene = "end";
+        }
+
+        if (Raylib.CheckCollisionRecs(playerRect, shootRect))
+        {
+            playerHealth -= 10;
+            if (playerHealth <= 0)
+            {
+                currentScene = "end";
+            }
+        }
+
+        if (Raylib.CheckCollisionRecs(enemyRect, shootRect))
+        {
+            duckHealth -= 10;
+            if (duckHealth <= 0)
+            {
+                //remove duck 
+            }
+        }
+        
     }
     else if (currentScene == "start")
     {
@@ -46,37 +107,49 @@ while (Raylib.WindowShouldClose() == false)
             currentScene = "game";
         }
     }
+
+    // Grafik
+    Raylib.BeginDrawing();
+    Raylib.ClearBackground(Color.WHITE);
+
+    if (currentScene == "game")
+    {
+        Raylib.DrawTexture(menuImage,
+            0,
+            0,
+            Color.WHITE);
+
+        Raylib.DrawTexture(playerImage,
+          (int)playerRect.x,
+          (int)playerRect.y,
+          Color.WHITE);
+        Raylib.DrawRectangleRec(trapRect, Color.RED);
+        Raylib.DrawRectangleRec(floorRect, Color.WHITE);
+        Raylib.DrawTexture(oldMan,
+          600,
+          400,
+          Color.WHITE);
+          
+        Raylib.DrawText($"Health = {playerHealth}", 0, 0, 30, Color.WHITE);
+    }
+    else if (currentScene == "start")
+    {
+        Raylib.DrawTexture(menuImage,
+            0,
+            0,
+            Color.WHITE);
+        Raylib.DrawText("Press [ENTER] to start", 75, 500, 30, Color.WHITE);
+
+    }
+    else if (currentScene == "end")
+    {
+        Raylib.DrawText("Game over", 10, 10, 64, Color.RED);
+        Raylib.DrawText("Press R to restart", 200, 200, 64, Color.BLUE);
+        if (Raylib.IsKeyDown(KeyboardKey.KEY_R))
+        {
+            currentScene = ("start");
+        }
+    }
+
+    Raylib.EndDrawing();
 }
-
-//Grafik
-Raylib.BeginDrawing();
-Raylib.ClearBackground(Color.WHITE);
-
-if (currentScene == "game")
-{
-    // Raylib.DrawTexture(//backgorund,
-    //     0,
-    //     0,
-    //     Color.WHITE);
-
-    Raylib.DrawTexture(avatarImage,
-      (int)playerRect.x,
-      (int)playerRect.y,
-      Color.WHITE);
-    Raylib.DrawRectangleRec(trapRect, Color.RED);
-}
-else if (currentScene == "start")
-{
-    Raylib.DrawTexture(menu,
-    0,
-    0,
-    Color.WHITE);
-    Raylib.DrawText("Press [ENTER] to start", 75, 500, 30, Color.WHITE);
-
-}
-else if (currentScene == "end")
-{
-    Raylib.DrawText("Game over", 10, 10, 64, Color.RED);
-}
-
-Raylib.EndDrawing();
