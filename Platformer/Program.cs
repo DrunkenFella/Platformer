@@ -21,6 +21,7 @@ Texture2D healthBoxImage = Raylib.LoadTexture("images/HealthBox.png");
 Texture2D doorImage = Raylib.LoadTexture("images/door.png");
 Texture2D oldMan = Raylib.LoadTexture("images/oldMan.png");
 Texture2D nerfDart = Raylib.LoadTexture("images/Nerfdart.png");
+Texture2D explotionImage = Raylib.LoadTexture("images/Explotions.png");
 
 
 
@@ -36,6 +37,7 @@ Rectangle oldManRect = new Rectangle(600, 400, oldMan.width + 70, oldMan.height)
 Rectangle trapRect = new Rectangle(700, 500, 64, 64);
 Rectangle floorRect = new Rectangle(600, 500, 64, 32);
 Rectangle shootRect = new Rectangle(0, 0, nerfDart.width, nerfDart.height);
+Rectangle explotionsRect = new Rectangle(0, 0, explotionImage.width, explotionImage.height);
 
 
 //Lägg till skot 
@@ -54,7 +56,6 @@ float g = 2;
 // verticalVelocity
 // gravity
 // playerRect
-
 
 
 bool directionRight = true;
@@ -100,11 +101,17 @@ while (Raylib.WindowShouldClose() == false)
             //skott åt hållet man tittar åt
             if (directionRight == true)
             {
-
+                Raylib.DrawTexture(nerfDart, 
+                (int)playerRect.x +10,
+                (int)playerRect.y,
+                Color.WHITE);
             }
             else if (directionRight == false)
             {
-
+                Raylib.DrawTexture(nerfDart, 
+                (int)playerRect.x -10,
+                (int)playerRect.y,
+                Color.WHITE);
             }
         }
 
@@ -114,10 +121,6 @@ while (Raylib.WindowShouldClose() == false)
         }
         // 1. applicera gravitation på velocity (velocity += grav)
         // 2. applicera velity på rect.y-värdet
-
-
-
-
 
         if (Raylib.CheckCollisionRecs(playerRect, trapRect))
         {
@@ -138,16 +141,23 @@ while (Raylib.WindowShouldClose() == false)
             duckHealth -= 10;
             if (duckHealth <= 0)
             {
-                //remove duck 
+                Raylib.DrawTexture(explotionImage,
+                (int)enemyRect.x,
+                (int)enemyRect.y,
+                Color.WHITE);
+                if (Raylib.CheckCollisionRecs(enemyRect, explotionsRect))
+                {
+                    Raylib.EndDrawing();
+                }
             }
         }
+    }
 
-        if (Raylib.CheckCollisionRecs(playerRect, floorRect))
-        {
-
-        }
+    if (Raylib.CheckCollisionRecs(playerRect, floorRect))
+    {
 
     }
+
     else if (currentScene == "start")
     {
         if (Raylib.IsKeyDown(KeyboardKey.KEY_ENTER))
@@ -155,7 +165,7 @@ while (Raylib.WindowShouldClose() == false)
             currentScene = "game";
         }
     }
-
+}
     // Grafik
     Raylib.BeginDrawing();
     Raylib.ClearBackground(Color.WHITE);
@@ -225,6 +235,4 @@ while (Raylib.WindowShouldClose() == false)
             playerRect.y = 40;
         }
     }
-
-    Raylib.EndDrawing();
-}
+Raylib.EndDrawing();
