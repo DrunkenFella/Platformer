@@ -1,11 +1,13 @@
 ﻿using Raylib_cs;
 Random generator = new Random();
 
-Raylib.InitWindow(800, 600, "Platform Ghost");
+Raylib.InitWindow(800, 600, "Ghost talk");
 Raylib.SetTargetFPS(60);
+Raylib.InitAudioDevice();
 
 //background
 Texture2D menuImage = Raylib.LoadTexture("images/Graveyard_menu.png");
+Texture2D winImage = Raylib.LoadTexture("images/winImage.png");
 
 
 //Images
@@ -22,7 +24,7 @@ Texture2D doorImage = Raylib.LoadTexture("images/door.png");
 Texture2D oldMan = Raylib.LoadTexture("images/oldMan.png");
 Texture2D nerfDart = Raylib.LoadTexture("images/Nerfdart.png");
 Texture2D explotionImage = Raylib.LoadTexture("images/Explotions.png");
-
+Music californiaG = Raylib.LoadMusicStream("california-girls-djlunatique.com");
 
 
 //Hitbox
@@ -32,7 +34,7 @@ Rectangle enemyRect = new Rectangle(0, 0, enemyImage.width, enemyImage.height);
 //props 
 Rectangle ammoboxRect = new Rectangle(0, 0, ammoboxImage.width, ammoboxImage.height);
 Rectangle healthboxRect = new Rectangle(0, 0, healthBoxImage.width, healthBoxImage.height);
-Rectangle doorRect = new Rectangle(0, 0, doorImage.width, doorImage.height);
+Rectangle doorRect = new Rectangle(0, 500, doorImage.width, doorImage.height);
 Rectangle oldManRect = new Rectangle(600, 400, oldMan.width + 70, oldMan.height);
 Rectangle trapRect = new Rectangle(700, 500, 64, 64);
 Rectangle floorRect = new Rectangle(600, 500, 64, 32);
@@ -45,13 +47,14 @@ Rectangle explotionsRect = new Rectangle(0, 0, explotionImage.width, explotionIm
 
 int playerHealth = 50;
 int duckHealth = 30;
+int xp = 0;
 
 //float shootSpeedRight = 10f;
 //float shootSpeedLeft =-10f;
 float speed = 5f;
 
-float velocity = -64f;
-float g = 2;
+// float velocity = -64f;
+// float g = 2;
 
 // verticalVelocity
 // gravity
@@ -101,24 +104,18 @@ while (Raylib.WindowShouldClose() == false)
             //skott åt hållet man tittar åt
             if (directionRight == true)
             {
-                Raylib.DrawTexture(nerfDart, 
-                (int)playerRect.x +10,
-                (int)playerRect.y,
-                Color.WHITE);
+
             }
             else if (directionRight == false)
             {
-                Raylib.DrawTexture(nerfDart, 
-                (int)playerRect.x -10,
-                (int)playerRect.y,
-                Color.WHITE);
+
             }
         }
 
-        while (playerRect.y >= velocity)
-        {
-            velocity += g;
-        }
+        // while (playerRect.y >= velocity)
+        // {
+
+        // }
         // 1. applicera gravitation på velocity (velocity += grav)
         // 2. applicera velity på rect.y-värdet
 
@@ -141,23 +138,10 @@ while (Raylib.WindowShouldClose() == false)
             duckHealth -= 10;
             if (duckHealth <= 0)
             {
-                Raylib.DrawTexture(explotionImage,
-                (int)enemyRect.x,
-                (int)enemyRect.y,
-                Color.WHITE);
-                if (Raylib.CheckCollisionRecs(enemyRect, explotionsRect))
-                {
-                    Raylib.EndDrawing();
-                }
+
             }
         }
     }
-
-    if (Raylib.CheckCollisionRecs(playerRect, floorRect))
-    {
-
-    }
-
     else if (currentScene == "start")
     {
         if (Raylib.IsKeyDown(KeyboardKey.KEY_ENTER))
@@ -165,10 +149,11 @@ while (Raylib.WindowShouldClose() == false)
             currentScene = "game";
         }
     }
-}
+
     // Grafik
     Raylib.BeginDrawing();
     Raylib.ClearBackground(Color.WHITE);
+
 
     if (directionRight == true)
     {
@@ -210,10 +195,22 @@ while (Raylib.WindowShouldClose() == false)
             Color.WHITE);
             if (Raylib.IsKeyDown(KeyboardKey.KEY_P))
             {
-                //ljudfil
+                Raylib.PlayMusicStream(californiaG);
+                xp++;
             }
         }
+
+        if (xp >= 200)
+        {
+            Raylib.DrawTexture(doorImage, 0, 500, Color.WHITE);
+        }
+        Raylib.DrawText($"xp = {xp}", 0, 30, 30, Color.WHITE);
         Raylib.DrawText($"Health = {playerHealth}", 0, 0, 30, Color.WHITE);
+        if (Raylib.CheckCollisionRecs(playerRect, doorRect))
+        {
+            currentScene = "win";
+        }
+
     }
     else if (currentScene == "start")
     {
@@ -228,11 +225,22 @@ while (Raylib.WindowShouldClose() == false)
     {
         Raylib.DrawText("Game over", 10, 10, 64, Color.RED);
         Raylib.DrawText("Press R to restart", 200, 200, 64, Color.BLUE);
-        if (Raylib.IsKeyDown(KeyboardKey.KEY_R))
+        if (Raylib.IsKeyPressed(KeyboardKey.KEY_R))
         {
             currentScene = ("game");
             playerRect.x = 20;
             playerRect.y = 40;
+            playerHealth = 50;
         }
     }
-Raylib.EndDrawing();
+    else if (currentScene == "win")
+    {
+        Raylib.ClearBackground(Color.WHITE);
+        Raylib.DrawTexture(winImage,
+        0,
+        0,
+        Color.WHITE);
+        Raylib.DrawText("You win!!", 200, 250, 50, Color.RED);
+    }
+    Raylib.EndDrawing();
+}
